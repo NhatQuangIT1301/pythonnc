@@ -1,22 +1,16 @@
 import tkinter as tk
 from tkinter import ttk, Menu, scrolledtext, messagebox
-import psycopg2
 from psycopg2 import sql
+import psycopg2
 
 class TinhLuong:
-    def __init__(self, root):
+    def __init__(self, root, conn):
         self.root = root
         self.root.title("Tinh luong")
         self.root.resizable(False,False)
 
-        self.conn = None
-        self.cur = None
-
-        self.database = "Management"
-        self.user = "postgres"
-        self.password = "130104"
-        self.host = "localhost"
-        self.port = "5432"
+        self.conn = conn
+        self.cur = self.conn.cursor()
 
         # Kích thước cửa sổ
         window_width = 350
@@ -37,8 +31,8 @@ class TinhLuong:
         self.root.iconbitmap('2274802010710_LuongNhatQuang_BaoCao2/IconDHVL.ico')
 
         #menu bar
-        menu_bar = Menu(win)
-        win.config(menu=menu_bar)
+        menu_bar = Menu(self.root)
+        self.root.config(menu=menu_bar)
         file_menu = Menu(menu_bar, tearoff=0)
         file_menu.add_command(label="Exit", command=exit)
         menu_bar.add_cascade(label="File", menu=file_menu)
@@ -46,12 +40,6 @@ class TinhLuong:
         help_menu = Menu(menu_bar, tearoff=0)
         help_menu.add_command(label="About", command=self.ThongTinSanPham)
         menu_bar.add_cascade(label="Help", menu=help_menu)
-
-        database_menu = Menu(menu_bar, tearoff=0)
-        database_menu.add_command(label="Create DB", command=self.create_DB)
-        database_menu.add_command(label="Create Table", command=self.create_Table)
-        database_menu.add_command(label="Connect DB", command=self.conn_DB)
-        menu_bar.add_cascade(label="Database", menu=database_menu)
 
         tabControl = ttk.Notebook(self.root)
         tabControl.pack(expand=1, fill="both")
@@ -222,66 +210,10 @@ class TinhLuong:
     def Clear_LuongQuanLy(self):
         self.scroll_QuanLy.delete(1.0, tk.END)
 
-    def create_DB(self):
-        try:
-            conn = psycopg2.connect(
-                database = "postgres", 
-                user = "postgres", 
-                password = "130104", 
-                host = "localhost", 
-                port = "5432"
-            )
-            conn.set_isolation_level(psycopg2.extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-            cur = conn.cursor()
-            database_name = "Management"
-            cur.execute(sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database_name)))
-            messagebox.showinfo("Thong Bao", "Create Database Success")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error create the new database: {e}")
-        finally:
-            if cur is not None:
-                cur.close()
-            if conn is not None:
-                conn.close()
-
-    def conn_DB(self):
-        try:
-            self.conn = psycopg2.connect(database = self.database, user = self.user, password = self.password, host = self.host, port = self.port)
-            messagebox.showinfo("Thong Bao", "Ket noi den database thanh cong!")
-            self.cur = self.conn.cursor()
-        except Exception as e:
-            messagebox.showerror("Error", f"Error connecting to the database: {e}")
-
-    def create_Table(self):
-        try:
-            self.conn_DB()
-            self.cur.execute('''CREATE TABLE NhanVien
-                            (
-                            ID SERIAL PRIMARY KEY NOT NULL,
-                            NAME TEXT NOT NULL,
-                            LUONGCOBAN DOUBLE PRECISION NOT NULL,
-                            SONGAYLAMVIEC DOUBLE PRECISION NOT NULL,
-                            TROCAP DOUBLE PRECISION NOT NULL,
-                            LUONG DOUBLE PRECISION NOT NULL   
-                            );''')
-            self.cur.execute('''CREATE TABLE QuanLy
-                            (
-                            ID SERIAL PRIMARY KEY NOT NULL,
-                            NAME TEXT NOT NULL,
-                            LUONGCOBAN DOUBLE PRECISION NOT NULL,
-                            HESOCHUCVU DOUBLE PRECISION NOT NULL,
-                            THUONG DOUBLE PRECISION NOT NULL,
-                            LUONG DOUBLE PRECISION NOT NULL
-                            );''')
-            self.conn.commit()
-            messagebox.showinfo("Thong Bao", "Create Table Success!")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error create the new table: {e}")
-
     def insert_DB_NhanVien(self):
         try:
             if (self.lcb_nhanvien.get() >= 0 and self.snlv.get() >= 0 and self.trocap.get() >= 0) and (self.name_nhanvien.get().strip()):
-                insert_query = sql.SQL("INSERT INTO {} (name, luongcoban, songaylamviec, trocap, luong) VALUES (%s, %s, %s, %s, %s)").format(sql.Identifier("nhanvien"))
+                insert_query = sql.SQL("INSERT INTO {} (hoten, luongcoban, songaylamviec, trocap, luong) VALUES (%s, %s, %s, %s, %s)").format(sql.Identifier("nhanvien"))
                 data_to_insert = (self.name_nhanvien.get(), self.lcb_nhanvien.get(), self.snlv.get(), self.trocap.get(), self.LuongNhanVien())
                 self.cur.execute(insert_query, data_to_insert)
                 self.conn.commit()
@@ -294,7 +226,7 @@ class TinhLuong:
     def insert_DB_QuanLy(self):
         try:
             if (self.lcb_quanly.get() >= 0 and self.hscv.get() >= 0 and self.thuong.get() >= 0) and (self.name_quanly.get().strip()):
-                insert_query = sql.SQL("INSERT INTO {} (name, luongcoban, hesochucvu, thuong, luong) VALUES (%s, %s, %s, %s, %s)").format(sql.Identifier("quanly"))
+                insert_query = sql.SQL("INSERT INTO {} (hoten, luongcoban, hesochucvu, thuong, luong) VALUES (%s, %s, %s, %s, %s)").format(sql.Identifier("quanly"))
                 data_to_insert = (self.name_quanly.get(), self.lcb_quanly.get(), self.hscv.get(), self.thuong.get(), self.LuongQuanLy())
                 self.cur.execute(insert_query, data_to_insert)
                 self.conn.commit()
@@ -307,7 +239,7 @@ class TinhLuong:
     def Search_LuongNhanVien(self):
         try:
             timkiem = self.search_nhanvien.get()
-            query_value = sql.SQL("SELECT * FROM {} WHERE name = %s").format(sql.Identifier("nhanvien"))
+            query_value = sql.SQL("SELECT * FROM {} WHERE hoten = %s").format(sql.Identifier("nhanvien"))
             self.cur.execute(query_value, (timkiem,))
             row_value = self.cur.fetchall()
 
@@ -334,7 +266,7 @@ class TinhLuong:
     def Search_LuongQuanLy(self):
         try:
             timkiem = self.search_quanly.get()
-            query_value = sql.SQL("SELECT * FROM {} WHERE name = %s").format(sql.Identifier("quanly"))
+            query_value = sql.SQL("SELECT * FROM {} WHERE hoten = %s").format(sql.Identifier("quanly"))
             self.cur.execute(query_value, (timkiem,))
             row_value = self.cur.fetchall()
 
@@ -358,7 +290,72 @@ class TinhLuong:
         except Exception as e:
             messagebox.showerror("Error", f"Error loading data: {e}")
 
+class Login:
+    def __init__(self, win):
+        self.win = win
+        self.win.title("Login")
+        self.win.resizable(False, False)
+
+        # Kích thước cửa sổ
+        window_width = 205
+        window_height = 160
+
+        # Lấy kích thước màn hình
+        screen_width = self.win.winfo_screenwidth()
+        screen_height = self.win.winfo_screenheight()
+
+        # Tính toán tọa độ x và y để đặt cửa sổ ở trung tâm
+        center_x = int(screen_width/2 - window_width/2)
+        center_y = int(screen_height/2 - window_height/2)
+
+        # Đặt kích thước và vị trí cửa sổ
+        self.win.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
+
+        #Đặt logo co form
+        self.win.iconbitmap('2274802010710_LuongNhatQuang_BaoCao2/IconDHVL.ico')
+
+        self.database = "Management"
+        self.host = "localhost"
+        self.port = "5432"
+        self.user = None
+        self.password = None
+
+        ttk.Label(self.win, text="Username").grid(column=0, row=0, padx=10, pady=5, sticky="W")
+
+        self.username_entry = tk.StringVar()
+        username_entry = ttk.Entry(self.win, width=30, textvariable=self.username_entry)
+        username_entry.grid(column=0, row=1, padx=10, pady=5, sticky="W")
+
+        ttk.Label(self.win, text="Password").grid(column=0, row=2, padx=10, pady=5, sticky="W")
+
+        self.password_entry = tk.StringVar()
+        password_entry = ttk.Entry(self.win, width=30, textvariable=self.password_entry, show="*")
+        password_entry.grid(column=0, row=3, padx=10, pady=5, sticky="W")
+
+        tk.Button(self.win, text="Save", command=self.save_and_switch).grid(column=0, row=4, pady=5)
+
+    def conn_DB(self):
+        try:
+            self.conn = psycopg2.connect(database = self.database, user = self.user, password = self.password, host = self.host, port = self.port)
+            messagebox.showinfo("Dang nhap", "Dang nhap thanh cong!")
+            return True
+        except Exception as e:
+            messagebox.showerror("Loi dang nhap!", "Dang nhap khong thanh cong")
+            return False
+
+    def save_and_switch(self):
+        try:
+            self.user = self.username_entry.get()
+            self.password = self.password_entry.get()
+            if self.conn_DB():
+                self.win.destroy()
+                root = tk.Tk()
+                TinhLuong(root, self.conn)
+                root.mainloop()
+        except Exception as e:
+            pass
+
 if __name__ == "__main__":
     win = tk.Tk()
-    TinhLuong(win)
+    Login(win)
     win.mainloop()
