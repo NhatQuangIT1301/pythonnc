@@ -1,6 +1,7 @@
+import os
 import tkinter as tk
 from tkinter import ttk, Menu, scrolledtext, messagebox
-from psycopg2 import sql
+from psycopg2 import sql, errors
 import psycopg2
 
 class TinhLuong:
@@ -14,7 +15,7 @@ class TinhLuong:
 
         # Kích thước cửa sổ
         window_width = 350
-        window_height = 650
+        window_height = 710
 
         # Lấy kích thước màn hình
         screen_width = self.root.winfo_screenwidth()
@@ -28,7 +29,7 @@ class TinhLuong:
         self.root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
         #Đặt logo co form
-        self.root.iconbitmap('2274802010710_LuongNhatQuang_BaoCao2/IconDHVL.ico')
+        self.root.iconbitmap(os.path.join(os.path.dirname(__file__),'IconDHVL.ico'))
 
         #menu bar
         menu_bar = Menu(self.root)
@@ -57,38 +58,45 @@ class TinhLuong:
         frame_NhanVien.grid(column=0, row=0, padx=25, pady=15)
         
         #label Tinh
+        lbl_id = ttk.Label(frame_NhanVien, text="Ma So Nhan Vien: ")
+        lbl_id.grid(column=0, row=0, padx=10, pady=10, sticky="W")
+
         lbl_name = ttk.Label(frame_NhanVien, text="Ho Ten: ")
-        lbl_name.grid(column=0, row=0, padx=10, pady=10, sticky="W")
+        lbl_name.grid(column=0, row=1, padx=10, pady=10, sticky="W")
         
         lbl_lcb = ttk.Label(frame_NhanVien, text="Luong Co Ban: ")
-        lbl_lcb.grid(column=0, row=1, padx=10, pady=10, sticky="W")
+        lbl_lcb.grid(column=0, row=2, padx=10, pady=10, sticky="W")
 
         lbl_snlv = ttk.Label(frame_NhanVien, text="So Ngay Lam Viec: ")
-        lbl_snlv.grid(column=0, row=2, padx=10, pady=10, sticky="W")
+        lbl_snlv.grid(column=0, row=3, padx=10, pady=10, sticky="W")
 
         lbl_trocap = ttk.Label(frame_NhanVien, text="Tro Cap: ")
-        lbl_trocap.grid(column=0, row=3, padx=10, pady=10, sticky="W")
+        lbl_trocap.grid(column=0, row=4, padx=10, pady=10, sticky="W")
         
         #textbox
+        self.id_nhanvien = tk.StringVar()
+        txt_id = ttk.Entry(frame_NhanVien, width=25, textvariable=self.id_nhanvien)
+        txt_id.grid(column=1, row=0, padx=10, pady=10)
+
         self.name_nhanvien = tk.StringVar()
         txt_name = ttk.Entry(frame_NhanVien, width=25, textvariable=self.name_nhanvien)
-        txt_name.grid(column=1, row=0, padx=10, pady=10)
+        txt_name.grid(column=1, row=1, padx=10, pady=10)
         txt_name.focus()
         
-        self.lcb_nhanvien = tk.DoubleVar()
+        self.lcb_nhanvien = tk.IntVar()
         txt_lcb = ttk.Entry(frame_NhanVien, width=25, textvariable=self.lcb_nhanvien)
-        txt_lcb.grid(column=1, row=1, padx=10, pady=10)
+        txt_lcb.grid(column=1, row=2, padx=10, pady=10)
 
-        self.snlv = tk.DoubleVar()
+        self.snlv = tk.IntVar()
         txt_sglv = ttk.Entry(frame_NhanVien, width=25, textvariable=self.snlv)
-        txt_sglv.grid(column=1, row=2, padx=10, pady=10)
+        txt_sglv.grid(column=1, row=3, padx=10, pady=10)
 
-        self.trocap = tk.DoubleVar()
+        self.trocap = tk.IntVar()
         txt_trocap = ttk.Entry(frame_NhanVien, width=25, textvariable=self.trocap)
-        txt_trocap.grid(column=1, row=3, padx=10, pady=10)
+        txt_trocap.grid(column=1, row=4, padx=10, pady=10)
 
         #btn Tinh
-        ttk.Button(frame_NhanVien, text="Save", command=self.insert_DB_NhanVien).grid(column=1, row=4, pady=10)
+        ttk.Button(frame_NhanVien, text="Save", command=self.insert_DB_NhanVien).grid(column=1, row=5, pady=10)
 
         #frame Tinh Luong Nhan Vien
         frame_LuongNhanVien = ttk.LabelFrame(tabNhanVien, text="Tim kiem")
@@ -125,38 +133,45 @@ class TinhLuong:
         frame_QuanLy.grid(column=0, row=0, padx=30, pady=15)
         
         #label Tinh
+        lbl_id = ttk.Label(frame_QuanLy, text="Ma So Quan Ly: ")
+        lbl_id.grid(column=0, row=0, padx=10, pady=10, sticky="W")
+        
         lbl_name = ttk.Label(frame_QuanLy, text="Ho Ten: ")
-        lbl_name.grid(column=0, row=0, padx=10, pady=10, sticky="W")
+        lbl_name.grid(column=0, row=1, padx=10, pady=10, sticky="W")
 
         lbl_lcb = ttk.Label(frame_QuanLy, text="Luong Co Ban")
-        lbl_lcb.grid(column=0, row=1, padx=10, pady=10, sticky="W")
+        lbl_lcb.grid(column=0, row=2, padx=10, pady=10, sticky="W")
 
         lbl_snlv = ttk.Label(frame_QuanLy, text="He So Chuc Vu")
-        lbl_snlv.grid(column=0, row=2, padx=10, pady=10, sticky="W")
+        lbl_snlv.grid(column=0, row=3, padx=10, pady=10, sticky="W")
 
         lbl_trocap = ttk.Label(frame_QuanLy, text="Thuong")
-        lbl_trocap.grid(column=0, row=3, padx=10, pady=10, sticky="W")
+        lbl_trocap.grid(column=0, row=4, padx=10, pady=10, sticky="W")
         
         #textbox
+        self.id_quanly = tk.StringVar()
+        txt_id = ttk.Entry(frame_QuanLy, width=25, textvariable=self.id_quanly)
+        txt_id.grid(column=1, row=0, padx=10, pady=10)
+
         self.name_quanly = tk.StringVar()
         txt_name = ttk.Entry(frame_QuanLy, width=25, textvariable=self.name_quanly)
-        txt_name.grid(column=1, row=0, padx=10, pady=10)
+        txt_name.grid(column=1, row=1, padx=10, pady=10)
         txt_name.focus()
 
-        self.lcb_quanly = tk.DoubleVar()
+        self.lcb_quanly = tk.IntVar()
         txt_lcb = ttk.Entry(frame_QuanLy, width=25, textvariable=self.lcb_quanly)
-        txt_lcb.grid(column=1, row=1, padx=10, pady=10)
+        txt_lcb.grid(column=1, row=2, padx=10, pady=10)
 
-        self.hscv = tk.DoubleVar()
+        self.hscv = tk.IntVar()
         txt_hscv = ttk.Entry(frame_QuanLy, width=25, textvariable=self.hscv)
-        txt_hscv.grid(column=1, row=2, padx=10, pady=10)
+        txt_hscv.grid(column=1, row=3, padx=10, pady=10)
 
-        self.thuong = tk.DoubleVar()
+        self.thuong = tk.IntVar()
         txt_thuong = ttk.Entry(frame_QuanLy, width=25, textvariable=self.thuong)
-        txt_thuong.grid(column=1, row=3, padx=10, pady=10)
+        txt_thuong.grid(column=1, row=4, padx=10, pady=10)
 
         #btn Tinh
-        ttk.Button(frame_QuanLy, text="Save", command=self.insert_DB_QuanLy).grid(column=1, row=4, pady=10)
+        ttk.Button(frame_QuanLy, text="Save", command=self.insert_DB_QuanLy).grid(column=1, row=5, pady=10)
 
         #frame Tinh Luong Nhan Vien
         frame_LuongQuanLy = ttk.LabelFrame(tabQuanLy, text="Ket Qua")
@@ -212,11 +227,14 @@ class TinhLuong:
 
     def insert_DB_NhanVien(self):
         try:
-            if (self.lcb_nhanvien.get() >= 0 and self.snlv.get() >= 0 and self.trocap.get() >= 0) and (self.name_nhanvien.get().strip()):
-                insert_query = sql.SQL("INSERT INTO {} (hoten, luongcoban, songaylamviec, trocap, luong) VALUES (%s, %s, %s, %s, %s)").format(sql.Identifier("nhanvien"))
-                data_to_insert = (self.name_nhanvien.get(), self.lcb_nhanvien.get(), self.snlv.get(), self.trocap.get(), self.LuongNhanVien())
-                self.cur.execute(insert_query, data_to_insert)
-                self.conn.commit()
+            if ((self.id_nhanvien.get().strip()) and self.lcb_nhanvien.get() >= 0 and self.snlv.get() >= 0 and self.trocap.get() >= 0) and (self.name_nhanvien.get().strip()):
+                try:
+                    query_insert = sql.SQL("INSERT INTO {} (id, hoten, luongcoban, songaylamviec, trocap, luong) VALUES (%s, %s, %s, %s, %s, %s)").format(sql.Identifier("nhanvien"))
+                    data_to_insert = (self.id_nhanvien.get(), self.name_nhanvien.get(), self.lcb_nhanvien.get(), self.snlv.get(), self.trocap.get(), self.LuongNhanVien())
+                    self.cur.execute(query_insert, data_to_insert)
+                    self.conn.commit()
+                except errors.UniqueViolation as e:
+                    messagebox.showwarning("Warning", "Id Already Exist!")
                 messagebox.showinfo("Success", "Insert Nhan Vien successfully!")
             else:
                 messagebox.showwarning("Warning", "Please check your input.")
@@ -225,11 +243,14 @@ class TinhLuong:
 
     def insert_DB_QuanLy(self):
         try:
-            if (self.lcb_quanly.get() >= 0 and self.hscv.get() >= 0 and self.thuong.get() >= 0) and (self.name_quanly.get().strip()):
-                insert_query = sql.SQL("INSERT INTO {} (hoten, luongcoban, hesochucvu, thuong, luong) VALUES (%s, %s, %s, %s, %s)").format(sql.Identifier("quanly"))
-                data_to_insert = (self.name_quanly.get(), self.lcb_quanly.get(), self.hscv.get(), self.thuong.get(), self.LuongQuanLy())
-                self.cur.execute(insert_query, data_to_insert)
-                self.conn.commit()
+            if ((self.id_quanly.get().strip()) and self.lcb_quanly.get() >= 0 and self.hscv.get() >= 0 and self.thuong.get() >= 0) and (self.name_quanly.get().strip()):
+                try:
+                    query_insert = sql.SQL("INSERT INTO {} (id, hoten, luongcoban, hesochucvu, thuong, luong) VALUES (%s, %s, %s, %s, %s, %s)").format(sql.Identifier("quanly"))
+                    data_to_insert = (self.id_quanly.get(), self.name_quanly.get(), self.lcb_quanly.get(), self.hscv.get(), self.thuong.get(), self.LuongQuanLy())
+                    self.cur.execute(query_insert, data_to_insert)
+                    self.conn.commit()
+                except errors.UniqueViolation as e:
+                    messagebox.showwarning("Warning", "Id Already Exist!")
                 messagebox.showinfo("Success", "Insert Quan Ly successfully!")
             else:
                 messagebox.showwarning("Warning", "Please check your input.")
@@ -239,7 +260,7 @@ class TinhLuong:
     def Search_LuongNhanVien(self):
         try:
             timkiem = self.search_nhanvien.get()
-            query_value = sql.SQL("SELECT * FROM {} WHERE hoten = %s").format(sql.Identifier("nhanvien"))
+            query_value = sql.SQL("SELECT * FROM {} WHERE id = %s").format(sql.Identifier("nhanvien"))
             self.cur.execute(query_value, (timkiem,))
             row_value = self.cur.fetchall()
 
@@ -266,7 +287,7 @@ class TinhLuong:
     def Search_LuongQuanLy(self):
         try:
             timkiem = self.search_quanly.get()
-            query_value = sql.SQL("SELECT * FROM {} WHERE hoten = %s").format(sql.Identifier("quanly"))
+            query_value = sql.SQL("SELECT * FROM {} WHERE id = %s").format(sql.Identifier("quanly"))
             self.cur.execute(query_value, (timkiem,))
             row_value = self.cur.fetchall()
 
@@ -312,13 +333,15 @@ class Login:
         self.win.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
         #Đặt logo co form
-        self.win.iconbitmap('2274802010710_LuongNhatQuang_BaoCao2/IconDHVL.ico')
+        self.win.iconbitmap(os.path.join(os.path.dirname(__file__),'IconDHVL.ico'))
 
-        self.database = "Management"
+        self.database = "QuanLyNhanSu"
         self.host = "localhost"
         self.port = "5432"
-        self.user = None
-        self.password = None
+        self.user = "postgres"
+        self.password = "130104"
+
+        self.conn = psycopg2.connect(database = self.database, user = self.user, password = self.password, host = self.host, port = self.port)
 
         ttk.Label(self.win, text="Username").grid(column=0, row=0, padx=10, pady=5, sticky="W")
 
@@ -334,26 +357,39 @@ class Login:
 
         tk.Button(self.win, text="Save", command=self.save_and_switch).grid(column=0, row=4, pady=5)
 
-    def conn_DB(self):
+    def conn_DB(self, user, passwd):
         try:
-            self.conn = psycopg2.connect(database = self.database, user = self.user, password = self.password, host = self.host, port = self.port)
-            messagebox.showinfo("Dang nhap", "Dang nhap thanh cong!")
-            return True
+            cur = self.conn.cursor()
+            query = sql.SQL("SELECT * FROM {} WHERE usr = %s AND passwd = %s").format(sql.Identifier("taikhoan"))
+            user_passwd = (user, passwd)
+            cur.execute(query, user_passwd)
+            result = cur.fetchone()
+
+            if result: 
+                messagebox.showinfo("Đăng nhập", "Đăng nhập thành công!") 
+                return True 
+            else: 
+                messagebox.showerror("Lỗi đăng nhập!", "Tên đăng nhập hoặc mật khẩu không đúng!") 
+                return False
+            
         except Exception as e:
-            messagebox.showerror("Loi dang nhap!", "Dang nhap khong thanh cong")
+            messagebox.showerror("Lỗi đăng nhập!", f"Đã xảy ra lỗi: {e}") 
             return False
+        
+        finally:
+            cur.close()
 
     def save_and_switch(self):
         try:
-            self.user = self.username_entry.get()
-            self.password = self.password_entry.get()
-            if self.conn_DB():
+            user = self.username_entry.get()
+            passwd = self.password_entry.get()
+            if self.conn_DB(user, passwd):
                 self.win.destroy()
                 root = tk.Tk()
                 TinhLuong(root, self.conn)
                 root.mainloop()
         except Exception as e:
-            pass
+            messagebox.showerror("Lỗi", f"Đã xảy ra lỗi: {e}")
 
 if __name__ == "__main__":
     win = tk.Tk()
