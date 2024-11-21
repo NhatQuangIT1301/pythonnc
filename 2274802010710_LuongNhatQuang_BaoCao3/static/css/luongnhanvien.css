@@ -1,0 +1,10 @@
+.body form{
+    padding: 20pt;
+    margin: auto;
+    width: 50%;
+    border: 0.5px solid rgba(180, 180, 180, 0.8);
+    border-radius: 20px;
+}
+.form-control{
+    border: 0.5px solid rgba(180, 180, 180, 0.8);
+}

@@ -1,0 +1,14 @@
+{% if request.path == url_for('index')%}
+<footer class="bd-footer py-md-5 bg">
+{% elif request.path == url_for('search') %}
+<footer class="bd-footer fixed-bottom py-md-5 bg">
+{% else %}
+<footer class="bd-footer py-md-5 mt-5 bg">
+{% endif %}
+    <p style="padding: 10px; margin-bottom: 10px;">
+        Báo cáo 3 Python Nâng Cao Lý Thuyết
+    </p>
+    <p style="padding: 10px; margin-bottom: 10px;">
+        Copyright &copy; LuongNhatQuang - 227480201710.
+    </p>
+</footer>

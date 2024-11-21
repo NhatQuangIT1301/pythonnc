@@ -1,0 +1,29 @@
+header, .search-bar .btn{
+    font-weight: 600;
+}
+.bg{
+    background-color: rgb(229, 229, 229);
+}
+.nav{
+    display: flex;
+    justify-content: space-between;
+}
+.dropdown-item:active{
+    color: aliceblue;
+    background-color: rgb(125, 125, 125);
+}
+.user{
+    text-decoration: none; 
+    color: rgb(91, 91, 91); 
+    padding: 0;
+}
+.user:active{
+    color: rgb(52, 52, 52);
+}
+.user-login{
+    margin: 0 10px;
+    font-size: 18px;
+}
+.search-bar{
+    padding: 0;
+}

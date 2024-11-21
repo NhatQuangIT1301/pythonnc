@@ -1,0 +1,47 @@
+<header>
+    <nav class="navbar fixed-top navbar-expand-lg bg">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse nav" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="{{ url_for('index') }}">Danh Sách</a>
+                    </li>
+
+                    {% if user.is_authenticated and user.id == 0 %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Tính Lương
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('nhanvien') }}">Nhân Viên</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('quanly') }}">Quản Lý</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('thongtin') }}">Thông Tin</a>
+                    </li>
+                </ul>
+                {% if request.path == url_for('index') or request.path == url_for('search') %}
+                <form class="d-flex search-bar" action="{{ url_for('search') }}" role="search" method="get">
+                    <input class="form-control me-3" type="search" name="search" placeholder="Nhập ID nhân sự" aria-label="Search" >
+                    <button class="btn btn-outline-secondary" style="min-width: fit-content;" type="submit">Tìm kiếm</button>
+                </form>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                <div class="dropdown user-login">
+                    <a class="user" href="#" data-bs-toggle="dropdown" aria-expanded="false">{{ user.usr }}</a>
+                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: max-content;">
+                        <li><a class="logout dropdown-item" style="text-align: right;" href="{{ url_for('dangxuat') }}">Đăng xuất</a></li>
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+</header>
